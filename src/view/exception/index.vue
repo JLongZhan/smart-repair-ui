@@ -10,7 +10,7 @@
       <van-pull-refresh v-model="refreshing" @refresh="onRefresh"
                         style="height: 100%"
                         success-text="刷新成功">
-        <van-tabs v-model:active="currentTab" animated sticky color="#1989fa" @change="_onTabChange">
+        <van-tabs :active="currentTab" animated sticky color="#1989fa" @change="_onTabChange">
           <van-tab v-for="(item,key) in groupTitles" :title="item" :key="key">
             <div v-if="exceptions.length>0">
               <!--
@@ -144,9 +144,9 @@ export default {
               }).catch(err => {
             console.log(err)
           })
-        }else{
+        } else {
           console.log("请从企业微信端进入")
-          this.$router.replace({"name":"qr"})
+          this.$router.replace({"name": "qr"})
         }
       }
     }
