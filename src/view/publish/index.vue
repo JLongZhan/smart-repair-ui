@@ -149,7 +149,9 @@ export default {
             "location": this.exception.location,
             "occurDate": this.exception.date + " " + this.exception.time,
             "publisher": this.exception.publisher,
-            "noticeObj": this.selectWeiXinUserId
+            "noticeObj": this.selectWeiXinUserId,
+            "noticeObjNames": this.selectWeiXinUserName,
+            "pushFrom": 1
           };
       console.log(param)
       this.$api.Exception.exceptionPush(param)

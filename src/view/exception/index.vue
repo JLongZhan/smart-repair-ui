@@ -64,7 +64,7 @@ export default {
     return {
       userId: undefined,
       currentTab: 0,
-      groupTitles: {0: '我发布的', 1: '我处理的'},
+      groupTitles: {0: '全部异常', 1: '与我相关'},
       publishPageInfo: {
         current: 1,
         size: 7
