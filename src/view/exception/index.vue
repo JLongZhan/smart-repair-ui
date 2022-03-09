@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100%;overflow: hidden;">
     <router-view></router-view>
     <div class="container-wrapper" v-if="$route.meta.index===0">
       <!--      <van-notice-bar-->
@@ -10,7 +10,7 @@
       <van-pull-refresh v-model="refreshing" @refresh="onRefresh"
                         style="height: 100%"
                         success-text="刷新成功">
-        <van-tabs :active="currentTab" animated sticky color="#1989fa" @change="_onTabChange">
+        <van-tabs v-model:active="currentTab" animated sticky color="#1989fa" @change="_onTabChange">
           <van-tab v-for="(item,key) in groupTitles" :title="item" :key="key">
             <div v-if="exceptions.length>0">
               <!--
@@ -26,9 +26,9 @@
                 <van-cell v-for="item in exceptions"
                           :key="item">
                   <van-card
-                      :price="item.location"
-                      :desc="item.targetDescription"
-                      :title="item.targetName"
+                      :price="item.location+' '+item.bindLine"
+                      :desc="item.exceptionDescription"
+                      :title="item.targetName+' - '+item.targetDescription"
                       thumb="https://wework.qpic.cn/wwpic/115896_gnADG-RDTCeeT1j_1642665588/0"
                       @click="_onExceptionItemClick(item.id)"
                       currency=""
@@ -62,7 +62,7 @@ export default {
   name: "index",
   data() {
     return {
-      userId: undefined,
+      userId: '',
       currentTab: 0,
       groupTitles: {0: '全部异常', 1: '与我相关'},
       publishPageInfo: {
@@ -106,6 +106,7 @@ export default {
         } else {
           this.finished = false;
         }
+        console.log(this.processExceptions.length)
         if (this.processExceptions.length === 0) {
           this._getProcessExceptionList();
         } else
@@ -119,7 +120,7 @@ export default {
       if (userId !== null) {
         this.userId = userId;
         this.userInfo = UserInfo;
-        this._getPublishExceptionList();
+        this._getAllPublishExceptionList();
       } else {
         let url = location.href;
         console.log("当前Url", location)
@@ -138,7 +139,7 @@ export default {
                   sessionStorage.setItem("UserInfo", this.userInfo);
                   sessionStorage.setItem("UserId", this.userInfo.userid);
                   this.userId = this.userInfo.userid;
-                  this._getPublishExceptionList();
+                  this._getAllPublishExceptionList();
                 } else {
                   this.$toast("获取用户信息失败  " + res.message)
                   this.$router.replace({"name": "qr"})
@@ -165,7 +166,7 @@ export default {
         this.publishPageInfo.current = 1;
         this.exceptions = this.publishExceptions = [];
         // 重新加载数据
-        this._getPublishExceptionList();
+        this._getAllPublishExceptionList();
       } else {
         this.processPageInfo.current = 1;
         this.exceptions = this.processExceptions = []
@@ -190,7 +191,7 @@ export default {
         ) {
           this.loading = true;
           this.publishPageInfo.current += 1;
-          this._getPublishExceptionList();
+          this._getAllPublishExceptionList();
         }
       } else {
         if (this.exceptions.length >= this.processPageInfo.size &&
@@ -235,12 +236,11 @@ export default {
     }
     ,
     /**
-     * 获取我发布的异常列表
+     * 获取全部异常列表
      * @private
      */
-    _getPublishExceptionList() {
+    _getAllPublishExceptionList() {
       let params = {
-        publisher: this.userId,
         current: this.publishPageInfo.current,
         size: this.publishPageInfo.size
       };
@@ -278,7 +278,7 @@ export default {
   },
   created() {
     this.getUserInfo();
-    // this._getPublishExceptionList();
+    // this._getAllPublishExceptionList();
   }
 }
 </script>
@@ -289,6 +289,8 @@ export default {
 }
 
 .container-wrapper {
+  width: 100%;
+  height: 100%;
 }
 
 ::v-deep(.van-pull-refresh) {

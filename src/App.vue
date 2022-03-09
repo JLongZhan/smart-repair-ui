@@ -3,7 +3,7 @@
     <van-nav-bar :title="$route.meta.title" v-if="$route.meta.showFooter" placeholder fixed safe-area-inset-top
                  class="title-bar"/>
     <router-view/>
-    <van-tabbar route fixed  placeholder="placeholder" v-if="$route.meta.showFooter">
+    <van-tabbar route fixed placeholder="placeholder" v-if="$route.meta.showFooter">
       <van-tabbar-item replace to="/exception" icon="home-o">异常列表</van-tabbar-item>
       <van-tabbar-item replace to="/publish" icon="search">异常推送</van-tabbar-item>
       <!--            <van-tabbar-item replace to="/mine" icon="search">我的</van-tabbar-item>-->
@@ -19,9 +19,7 @@ export default {
       userInfo: {}
     }
   },
-  methods: {
-
-  },
+  methods: {},
   created() {
     // https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxb0e730f57b92d615&
     //     redirect_uri=https%3A%2F%2Fplatform.acousticlink.com.cn%2F&response_type=code&scope=snsapi_base#wechat_redirect
@@ -33,6 +31,10 @@ export default {
 }
 </script>
 <style scoped>
+#app {
+  overflow: hidden;
+}
+
 body {
   font-size: 16px;
   background-color: #f8f8f8;
