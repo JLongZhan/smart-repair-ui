@@ -41,32 +41,22 @@
       <!--          show-word-limit-->
       <!--      />-->
       <van-field
-          v-model="date"
+          v-model="datetime"
           is-link
           readonly
           name="calendar"
-          label="异常完成日期"
-          placeholder="点击选择日期"
+          label="处理完成时间"
+          placeholder="点击选择时间,默认当前时间"
           @click="showCalendar = true"
       />
-      <van-calendar v-model:show="showCalendar" @confirm="_onDateConfirmChoose"/>
-      <van-field
-          v-model="time"
-          is-link
-          readonly
-          name="datetimePicker"
-          label="异常完成时间"
-          placeholder="点击选择时间"
-          @click="showTimePicker = true"
+      <van-overlay :show="showCalendar" @click="showCalendar = false">
+        <van-datetime-picker type="datetime"
 
-      />
-      <van-popup v-show="showTimePicker" position="bottom">
-        <van-datetime-picker
-            type="time"
-            @confirm="_onTimeConfirmChoose"
-            @cancel="showTimePicker = false"
-        />
-      </van-popup>
+                             class="overlay-wrapper"
+                             :min-date="minDate"
+                             @cancel="showCalendar = false"
+                             @confirm="_onDateConfirmChoose"/>
+      </van-overlay>
     </van-cell-group>
     <van-button type="primary" size="large" @click="_complete">提交</van-button>
 
@@ -83,22 +73,24 @@ export default {
       cause: "",
       countermeasure: "",
       remark: "",
-      showTimePicker: false,
       showCalendar: false,
-      date: "",
-      time: ''
+      datetime: undefined,
+      minDate: new Date(2022, 2, 1)
     }
   },
   methods: {
     _onDateConfirmChoose(val) {
-      console.log("_onDateConfirmChoose", val)
-      this.date = `${1900 + val.getYear()}-${val.getMonth() + 1}-${val.getDate()}`;
+      console.log(val);
+      let h = val.getHours();
+      if (h >= 0 && h <= 9)
+        h = '0' + h
+
+      let m = val.getMinutes();
+      if (m >= 0 && m <= 9)
+        m = '0' + m
+      this.datetime = `${1900 + val.getYear()}-${val.getMonth() + 1}-${val.getDate()} ${h}:${m}`;
       this.showCalendar = false;
-    },
-    _onTimeConfirmChoose(value) {
-      console.log("_onTimeConfirmChoose", value)
-      this.time = value;
-      this.showTimePicker = false;
+      console.log("_onDateConfirmChoose", this.datetime)
     },
     onClickLeft() {
       history.back();
@@ -110,7 +102,7 @@ export default {
         cause: this.cause,
         countermeasure: this.countermeasure,
         remark: this.remark,
-        completeTime: this.date + " " + this.time
+        completeTime: this.datetime
       }
       this.$api.Exception.exceptionProcessComplete(param)
           .then(res => {
@@ -152,5 +144,11 @@ export default {
 ::v-deep( .van-nav-bar__title) {
   font-weight: bold;
   color: #fff;
+}
+
+.overlay-wrapper {
+  width: 100%;
+  position: absolute;
+  bottom: 40%;
 }
 </style>

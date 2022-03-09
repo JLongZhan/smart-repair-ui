@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" id="publish">
     <van-form @submit="onSubmit">
       <van-cell-group inset>
         <van-field
@@ -27,33 +27,22 @@
             :rules="[{ required: true, message: '请填写异常地点' }]"
         />
         <van-field
-            v-model="exception.date"
+            v-model="exception.datetime"
             is-link
             readonly
             name="calendar"
-            label="异常日期"
-            placeholder="点击选择日期"
-            @click="showCalendar = true"
-        />
-        <van-calendar v-model:show="showCalendar" @confirm="_onDateConfirmChoose"/>
-        <van-field
-            v-model="exception.time"
-            is-link
-            readonly
-            name="datetimePicker"
             label="异常时间"
             placeholder="点击选择时间"
-            @click="showTimePicker = true"
-
+            @click="showCalendar = true"
         />
-        <van-popup v-show="showTimePicker" position="bottom">
-          <van-datetime-picker
-              type="time"
-              @confirm="_onTimeConfirmChoose"
-              @cancel="showTimePicker = false"
-          />
-        </van-popup>
+        <van-overlay :show="showCalendar" @click="showCalendar = false">
+          <van-datetime-picker type="datetime"
 
+                               class="overlay-wrapper"
+                               :min-date="minDate"
+                               @cancel="showCalendar = false"
+                               @confirm="_onDateConfirmChoose"/>
+        </van-overlay>
         <van-field
             class="target-wrapper"
             clearable
@@ -86,16 +75,15 @@ const wx = require('work-weixin-js-sdk')
 export default {
   data() {
     return {
+      currentDate: undefined,
       exception: {
         target: '',
         description: '',
         location: '',
-        date: '',
-        time: '',
+        datetime: '',
         publisher: '',
       },
-
-      showTimePicker: false,
+      minDate: new Date(2022, 2, 1),
       showCalendar: false,
       selectWeiXinUser: [],
       selectWeiXinUserId: [],
@@ -117,26 +105,30 @@ export default {
   },
   methods: {
     _onDateConfirmChoose(val) {
-      console.log("_onDateConfirmChoose", val)
-      this.exception.date = `${1900 + val.getYear()}-${val.getMonth() + 1}-${val.getDate()}`;
+      console.log(val);
+      // this.exception.date = `${1900 + val.getYear()}-${val.getMonth() + 1}-${val.getDate()}`;
+      let h = val.getHours();
+      if (h >= 0 && h <= 9)
+        h = '0' + h
+
+      let m = val.getMinutes();
+      if (m >= 0 && m <= 9)
+        m = '0' + m
+      this.exception.datetime = `${1900 + val.getYear()}-${val.getMonth() + 1}-${val.getDate()} ${h}:${m}`;
       this.showCalendar = false;
+      console.log("_onDateConfirmChoose", this.exception.datetime)
     },
-    _onTimeConfirmChoose(value) {
-      console.log("_onTimeConfirmChoose", value)
-      this.exception.time = value;
-      this.showTimePicker = false;
-    },
+
     onSubmit() {
       console.log("提交")
     },
     _exceptionPush() {
-      console.log("日期", this.exception.date + " " + this.exception.time,)
       if (this.selectWeiXinUser.length === 0) {
         this.$toast("请选择推送人员");
         return;
       }
       if (this.exception.target === '' ||
-          this.exception.date === '' || this.exception.time === ''
+          this.exception.datetime === ''
           || this.exception.description === '' || this.exception.location === '') {
         this.$toast("请输入完信息在提交");
         return;
@@ -147,7 +139,7 @@ export default {
             "targetName": this.exception.target,
             "targetDescription": this.exception.description,
             "location": this.exception.location,
-            "occurDate": this.exception.date + " " + this.exception.time,
+            "occurDate": this.exception.datetime,
             "publisher": this.exception.publisher,
             "noticeObj": this.selectWeiXinUserId,
             "noticeObjNames": this.selectWeiXinUserName,
@@ -266,4 +258,9 @@ export default {
   color: #646566 !important;
 }
 
+.overlay-wrapper {
+  width: 100%;
+  position: absolute;
+  bottom: 40%;
+}
 </style>

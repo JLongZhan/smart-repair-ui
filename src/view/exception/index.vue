@@ -92,6 +92,7 @@ export default {
   },
   methods: {
     _onTabChange(e) {
+      console.log("_onTabChange", e)
       if (e === 0) {
         this.exceptions = this.publishExceptions;
         if (this.publishExceptions.pages > 1 && this.publishExceptions.current === this.publishExceptions.pages) {
@@ -140,6 +141,7 @@ export default {
                   this._getPublishExceptionList();
                 } else {
                   this.$toast("获取用户信息失败  " + res.message)
+                  this.$router.replace({"name": "qr"})
                 }
               }).catch(err => {
             console.log(err)
@@ -215,6 +217,9 @@ export default {
             this.refreshing = false;
             this.loading = false;
             if (res.code === 0) {
+              if (res.data.current === 1) {
+                this.processExceptions = []
+              }
               this.exceptions = this.processExceptions = this.processExceptions.concat(res.data.records);
               this.processPageInfo = res.data;
               if (res.data.pages > 1 && res.data.current === res.data.pages) {
@@ -245,6 +250,10 @@ export default {
             this.loading = false;
 
             if (res.code === 0) {
+              console.log(this.exceptions, this.publishExceptions)
+              if (res.data.current === 1) {
+                this.publishExceptions = []
+              }
               this.exceptions = this.publishExceptions = this.publishExceptions.concat(res.data.records);
               this.publishPageInfo = res.data;
               if (res.data.pages > 1 && res.data.current === res.data.pages) {

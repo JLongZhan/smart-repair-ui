@@ -159,4 +159,6 @@ input {
 :root {
     --van-font-weight-bold: 700;
     --van-cell-line-height: 30px;
+    --van-cell-vertical-padding:10px;
+    --van-cell-horizontal-padding: 2px
 }

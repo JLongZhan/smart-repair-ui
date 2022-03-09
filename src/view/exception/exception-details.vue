@@ -18,7 +18,7 @@
               disabled
           />
           <van-field
-              v-model="exception.targetDescription"
+              v-model="exception.exceptionDescription"
               name="异常描述"
               label="异常描述"
               disabled
@@ -30,9 +30,22 @@
               disabled
           />
           <van-field
+              v-model="exception.noticeObjs"
+              name="通知对象"
+              label="通知对象"
+              disabled
+          />
+          <van-field
               v-model="exception.occurTime"
               name="异常发生时间"
               label="异常发生时间"
+              disabled
+          />
+
+          <van-field
+              v-model="exception.remark"
+              name="异常备注"
+              label="异常备注"
               disabled
           />
 
@@ -66,12 +79,6 @@
               disabled
           />
 
-          <van-field
-              v-model="exception.processInfo.remark"
-              name="异常处理备注"
-              label="异常处理备注"
-              disabled
-          />
           <van-field
               v-model="exception.processInfo.complete_time"
               name="异常完成时间"
@@ -114,7 +121,9 @@ export default {
       exception: {
         targetName: "",
         targetDescription: "",
+        exceptionDescription: '',
         location: "",
+        bindLine: "",
         occurTime: "",
         currentState: 0,
         processInfo: {
@@ -141,7 +150,12 @@ export default {
               this.exception = res.data;
               if (this.exception.processInfo !== null) {
                 this.processStateText[1] = this.exception.processInfo.handlerName + this.processStateText[1];
+                this.exception.targetName += (" - " + this.exception.targetDescription)
+                this.exception.location += " " + this.exception.bindLine;
                 this.showCompleteButton = (this.userId === this.exception.processInfo.handlerId);
+                this.exception.noticeObjs = JSON.parse(this.exception.noticeObjs);
+                console.log(this.showCompleteButton);
+                console.log(this.userId, this.exception.processInfo.handlerId);
               }
             } else {
               this.$toast("请求失败" + res.message);
