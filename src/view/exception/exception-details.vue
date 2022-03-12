@@ -73,6 +73,13 @@
               disabled
           />
           <van-field
+              v-if="exception.processInfo.normVal"
+              v-model="exception.processInfo.normVal"
+              name="异常影响指标"
+              label="异常影响指标"
+              disabled
+          />
+          <van-field
               v-model="exception.processInfo.countermeasure"
               name="异常处理对策"
               label="异常处理对策"
@@ -80,7 +87,8 @@
           />
 
           <van-field
-              v-model="exception.processInfo.complete_time"
+              v-if="exception.processInfo.completeTime"
+              v-model="exception.processInfo.completeTime"
               name="异常完成时间"
               label="异常完成时间"
               disabled
@@ -131,7 +139,7 @@ export default {
           cause: null,
           countermeasure: null,
           handlerName: "",
-          complete_time: "",
+          completeTime: "",
           remark: "",
         }
       },
@@ -148,14 +156,15 @@ export default {
           .then(res => {
             if (res.code === 0) {
               this.exception = res.data;
+              this.exception.targetName += (" - " + this.exception.targetDescription)
+              this.exception.location += " " + this.exception.bindLine;
+              this.exception.noticeObjs = JSON.parse(this.exception.noticeObjs);
               if (this.exception.processInfo !== null) {
                 this.processStateText[1] = this.exception.processInfo.handlerName + this.processStateText[1];
-                this.exception.targetName += (" - " + this.exception.targetDescription)
-                this.exception.location += " " + this.exception.bindLine;
+
                 this.showCompleteButton = (this.userId === this.exception.processInfo.handlerId);
-                this.exception.noticeObjs = JSON.parse(this.exception.noticeObjs);
-                console.log(this.showCompleteButton);
-                console.log(this.userId, this.exception.processInfo.handlerId);
+
+                this.exception.processInfo.normVal = JSON.parse(this.exception.processInfo.normVal);
               }
             } else {
               this.$toast("请求失败" + res.message);
@@ -183,9 +192,15 @@ export default {
      * @private
      */
     _processException() {
+      let userInfo = sessionStorage.getItem("UserInfo");
+      let username = '';
+      if (userInfo) {
+        username = userInfo.name;
+      }
       let param = {
         exceptionId: parseInt(this.currentId),
-        handlerId: this.userId
+        handlerId: this.userId,
+        handlerName: username
       }
       this.$api.Exception.exceptionProcess(param)
           .then(res => {

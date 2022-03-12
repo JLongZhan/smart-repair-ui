@@ -95,13 +95,14 @@ export default {
       console.log("_onTabChange", e)
       if (e === 0) {
         this.exceptions = this.publishExceptions;
-        if (this.publishExceptions.pages > 1 && this.publishExceptions.current === this.publishExceptions.pages) {
+        if (this.publishPageInfo.pages > 1 && this.publishPageInfo.current === this.publishPageInfo.pages) {
           this.finished = true;
         } else {
           this.finished = false;
         }
       } else {
-        if (this.processExceptions.pages > 1 && this.processExceptions.current === this.processExceptions.pages) {
+        this.exceptions = this.processExceptions;
+        if (this.processPageInfo.pages > 1 && this.processPageInfo.current === this.processPageInfo.pages) {
           this.finished = true;
         } else {
           this.finished = false;
@@ -109,8 +110,7 @@ export default {
         console.log(this.processExceptions.length)
         if (this.processExceptions.length === 0) {
           this._getProcessExceptionList();
-        } else
-          this.exceptions = this.processExceptions;
+        }
       }
     },
 
@@ -126,16 +126,20 @@ export default {
         console.log("当前Url", location)
         if (url.indexOf("code=") !== -1) {
           let code = url.slice(url.indexOf('=') + 1, url.indexOf('&state'));
-          console.log("code:", code)
+
+          let hq = url.slice(url.lastIndexOf('state=') + 6);
+          console.log("code:", code, hq)
           if (code == null) {
             return;
           }
           this.$api.WeiXinApi.getUserInfo({
-            "code": code
+            "code": code,
+            "hq": hq === "HQ"
           })
               .then(res => {
                 if (res.code === 0) {
                   this.userInfo = res.data;
+                  sessionStorage.setItem("hq", hq);
                   sessionStorage.setItem("UserInfo", this.userInfo);
                   sessionStorage.setItem("UserId", this.userInfo.userid);
                   this.userId = this.userInfo.userid;
@@ -213,14 +217,14 @@ export default {
         current: this.processPageInfo.current,
         size: this.processPageInfo.size
       };
+      if (this.processPageInfo.current === 1) {
+        this.processExceptions = []
+      }
       this.$api.Exception.exceptionList(params)
           .then(res => {
             this.refreshing = false;
             this.loading = false;
             if (res.code === 0) {
-              if (res.data.current === 1) {
-                this.processExceptions = []
-              }
               this.exceptions = this.processExceptions = this.processExceptions.concat(res.data.records);
               this.processPageInfo = res.data;
               if (res.data.pages > 1 && res.data.current === res.data.pages) {

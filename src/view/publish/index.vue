@@ -133,7 +133,7 @@ export default {
         this.$toast("请输入完信息在提交");
         return;
       }
-
+      let hq = sessionStorage.getItem("hq");
       let param =
           {
             "targetName": this.exception.target,
@@ -143,7 +143,8 @@ export default {
             "publisher": this.exception.publisher,
             "noticeObj": this.selectWeiXinUserId,
             "noticeObjNames": this.selectWeiXinUserName,
-            "pushFrom": 1
+            "pushFrom": 1,
+            "hq": "HQ" === hq
           };
       console.log(param)
       this.$api.Exception.exceptionPush(param)

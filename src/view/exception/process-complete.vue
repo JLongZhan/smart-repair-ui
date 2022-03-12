@@ -19,6 +19,20 @@
           placeholder="请输入您发现的异常原因"
           show-word-limit
       />
+      <van-divider
+          :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 10px' }"
+      >
+        影响指标
+      </van-divider>
+      <van-checkbox-group v-model="impactValues" direction="horizontal" style="margin: 10px 0px">
+        <van-checkbox style="padding: 5px " :name="item" v-for="(item, index) in impactIndicatorList"
+                      @click="checkToggle(item)" :key="index">
+          {{ item }}
+        </van-checkbox>
+      </van-checkbox-group>
+      <van-divider
+          :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 10px' }">
+      </van-divider>
       <van-field
           v-model="countermeasure"
           rows="3"
@@ -58,6 +72,7 @@
                              @confirm="_onDateConfirmChoose"/>
       </van-overlay>
     </van-cell-group>
+
     <van-button type="primary" size="large" @click="_complete">提交</van-button>
 
   </div>
@@ -75,10 +90,16 @@ export default {
       remark: "",
       showCalendar: false,
       datetime: undefined,
+      impactValues: [],
+      normValues: [],
+      impactIndicatorList: ['品质', '效率', '交期', '成本', '安全'],
       minDate: new Date(2022, 2, 1)
     }
   },
   methods: {
+    checkToggle(event) {
+      console.log("checkToggle", event);
+    },
     _onDateConfirmChoose(val) {
       console.log(val);
       let h = val.getHours();
@@ -102,8 +123,11 @@ export default {
         cause: this.cause,
         countermeasure: this.countermeasure,
         remark: this.remark,
-        completeTime: this.datetime
+        completeTime: this.datetime,
+        normValues: this.impactValues
       }
+      console.log(param)
+
       this.$api.Exception.exceptionProcessComplete(param)
           .then(res => {
             if (res.code === 0) {

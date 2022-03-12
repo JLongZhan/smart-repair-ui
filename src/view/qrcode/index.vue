@@ -1,6 +1,9 @@
 <template>
-  <div id="code">
+
+
+    <div id="code">
   </div>
+
 </template>
 
 <script>
@@ -9,10 +12,15 @@ import WwLogin from '../../assets/common/wwLogin-1.2.5'
 
 export default {
   data() {
-    return {};
+    return {
+
+
+    };
   },
 
-  methods: {},
+  methods: {
+
+  },
   mounted() {
     new WwLogin({
       "id": "code",
@@ -28,9 +36,9 @@ export default {
 </script>
 
 <style lang="less">
-  #code{
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-  }
+#code {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
 </style>
