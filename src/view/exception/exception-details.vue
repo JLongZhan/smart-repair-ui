@@ -78,7 +78,12 @@
               name="异常影响指标"
               label="异常影响指标"
               disabled
-          />
+          >
+            <!--            <template #button>-->
+            <!--              <van-button style="margin: 0px 20px" size="small" :key="item" v-for="(item,index) in exception.processInfo.normVal"-->
+            <!--                          type="primary">{{item}}{{index}}</van-button>-->
+            <!--            </template>-->
+          </van-field>
           <van-field
               v-model="exception.processInfo.countermeasure"
               name="异常处理对策"
@@ -227,6 +232,10 @@ export default {
 .details-wrapper {
   width: 100%;
   height: 100%;
+}
+
+::v-deep(.van-field__label) {
+  color: #323233 !important;
 }
 
 .form-wrapper ::v-deep(.van-cell) {
