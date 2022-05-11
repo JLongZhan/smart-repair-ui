@@ -13,11 +13,15 @@ const WeiXinApi = {
             {
                 params: params
             });
+    },
+    // post提交
+    exit(params) {
+        return axios.get("http://192.168.162.126:8000/auth-server/exit", (params));
+    },
+    // post提交
+    callback(params) {
+        return axios.get("http://192.168.162.126:8000/auth-server/callback", (params));
     }
-    // // post提交
-    // login(params) {
-    //     return axios.post(`${base.sq}/accesstoken`, qs.stringify(params));
-    // }
     // 其他接口…………
 }
 

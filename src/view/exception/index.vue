@@ -1,16 +1,17 @@
 <template>
-  <div style="height: 100%;overflow: hidden;">
+  <div style="height: 100%;">
     <router-view></router-view>
-    <div class="container-wrapper" v-if="$route.meta.index===0">
+    <div style="min-height: 70%">
       <!--      <van-notice-bar-->
       <!--          left-icon="volume-o"-->
       <!--          v-if="noticeStr.length>0"-->
       <!--          :text="noticeStr"-->
       <!--      />-->
-      <van-pull-refresh v-model="refreshing" @refresh="onRefresh"
-                        style="height: 100%"
+      <van-pull-refresh v-model="refreshing" @refresh="onRefresh" class="container-wrapper" v-if="$route.meta.index===0"
+
                         success-text="刷新成功">
-        <van-tabs v-model:active="currentTab" animated sticky color="#1989fa" @change="_onTabChange">
+        <van-tabs style="height: 100%" v-model:active="currentTab" animated sticky color="#1989fa"
+                  @change="_onTabChange">
           <van-tab v-for="(item,key) in groupTitles" :title="item" :key="key">
             <div v-if="exceptions.length>0">
               <!--
@@ -26,7 +27,9 @@
                 <van-cell v-for="item in exceptions"
                           :key="item">
                   <van-card
+                      :class="item.currentState===0?'un-process':item.currentState===1?'process':'processed'"
                       :price="item.location+' '+item.bindLine"
+                      :tag="item.state"
                       :desc="item.exceptionDescription"
                       :title="item.targetName+' - '+item.targetDescription"
                       thumb="https://wework.qpic.cn/wwpic/115896_gnADG-RDTCeeT1j_1642665588/0"
@@ -34,13 +37,11 @@
                       currency=""
                   >
                     <template #tags>
-                      <van-tag plain :type="item.currentState===0?'danger':item.currentState===1?'primary':'success'">
-                        {{ item.state }}
-                      </van-tag>
-                    </template>
-                    <template #footer>
+                      <div class="card-time">
+                        {{ item.occurTime }}
+                      </div>
+                      <van-tag plain type="primary" v-if="item.exceptionType">{{ item.exceptionType }}</van-tag>
 
-                      <div>{{ item.occurTime }}</div>
                     </template>
                   </van-card>
                 </van-cell>
@@ -51,6 +52,7 @@
           </van-tab>
         </van-tabs>
       </van-pull-refresh>
+      <div style="height: 50px"></div>
     </div>
   </div>
 
@@ -64,14 +66,14 @@ export default {
     return {
       userId: '',
       currentTab: 0,
-      groupTitles: {0: '全部异常', 1: '与我相关'},
+      groupTitles: {0: '全部异常', 1: '我处理的'},
       publishPageInfo: {
         current: 1,
         size: 7
       },
       processPageInfo: {
         current: 1,
-        size: 7
+        size: 10
       },
       noticeStr: '智能叫修',
       chooseGroup: 0,
@@ -113,7 +115,23 @@ export default {
         }
       }
     },
+    /**
+     * 根据url路径获取参数
+     * @param query
+     * @param variable
+     * @returns {string|boolean}
+     */
+    getQueryVariable(query, variable) {
 
+      let vars = query.split("&");
+      for (let i = 0; i < vars.length; i++) {
+        let pair = vars[i].split("=");
+        if (pair[0] === variable) {
+          return pair[1];
+        }
+      }
+      return false;
+    },
     getUserInfo() {
       let userId = sessionStorage.getItem("UserId");
       let UserInfo = sessionStorage.getItem("UserInfo");
@@ -124,14 +142,10 @@ export default {
       } else {
         let url = location.href;
         console.log("当前Url", location)
-        if (url.indexOf("code=") !== -1) {
-          let code = url.slice(url.indexOf('=') + 1, url.indexOf('&state'));
-
-          let hq = url.slice(url.lastIndexOf('state=') + 6);
+        let code = this.getQueryVariable(url.slice(url.indexOf('?') + 1), 'code');
+        if (code !== false) {
+          let hq = this.getQueryVariable(url.slice(url.indexOf('?') + 1), 'state');
           console.log("code:", code, hq)
-          if (code == null) {
-            return;
-          }
           this.$api.WeiXinApi.getUserInfo({
             "code": code,
             "hq": hq === "HQ"
@@ -140,7 +154,7 @@ export default {
                 if (res.code === 0) {
                   this.userInfo = res.data;
                   sessionStorage.setItem("hq", hq);
-                  sessionStorage.setItem("UserInfo", this.userInfo);
+                  sessionStorage.setItem("UserInfo", JSON.stringify(this.userInfo));
                   sessionStorage.setItem("UserId", this.userInfo.userid);
                   this.userId = this.userInfo.userid;
                   this._getAllPublishExceptionList();
@@ -277,17 +291,29 @@ export default {
      * @private
      */
     _onExceptionItemClick(id) {
-      this.$router.push({name: 'ExceptionDetails', params: {id: id}});
+      this.$router.push({name: 'ExceptionDetails', query: {id: id}});
     }
   },
   created() {
-    // this.getUserInfo();
-    this._getAllPublishExceptionList();
+    this.getUserInfo();
+    // this._getAllPublishExceptionList();
   }
 }
 </script>
 
 <style scoped>
+.un-process ::v-deep(.van-card__thumb .van-tag) {
+  background: var(--van-tag-danger-color) !important;
+}
+
+.process ::v-deep(.van-card__thumb .van-tag) {
+  background: var(--van-tag-primary-color) !important;
+}
+
+.processed ::v-deep(.van-card__thumb .van-tag) {
+  background: var(--van-tag-success-color) !important;
+}
+
 ::v-deep(.van-tab) {
   font-size: 16px;
 }
@@ -305,9 +331,9 @@ export default {
   height: var(--van-nav-bar-height);;
 }
 
-.title-bar ::v-deep .van-nav-bar__content {
+::v-deep(.van-card) {
   width: 100%;
-  background: #1989fa;
+  padding: 8px 10px;
 }
 
 .title-bar
@@ -331,6 +357,11 @@ export default {
 }
 
 ::v-deep(.van-tag) {
+  margin: 5px 0;
+  padding: 4px;
+}
+
+.card-time {
   margin: 5px 0;
   padding: 4px;
 }

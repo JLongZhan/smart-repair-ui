@@ -2,10 +2,10 @@
   <div id="app">
     <van-nav-bar :title="$route.meta.title" v-if="$route.meta.showFooter" placeholder fixed safe-area-inset-top
                  class="title-bar"/>
-    <router-view/>
+    <router-view />
     <van-tabbar route fixed placeholder="placeholder" v-if="$route.meta.showFooter">
       <van-tabbar-item replace to="/exception" icon="home-o">异常列表</van-tabbar-item>
-      <van-tabbar-item replace to="/publish" icon="search">异常推送</van-tabbar-item>
+<!--      <van-tabbar-item replace to="/publish" icon="search">异常推送</van-tabbar-item>-->
       <!--            <van-tabbar-item replace to="/mine" icon="search">我的</van-tabbar-item>-->
     </van-tabbar>
   </div>
@@ -26,13 +26,11 @@ export default {
     // let test = 'http://platform.acousticlink.com.cn:200/?code=a622KY1hWRailrZHGMtX7weGUf3fiIBjCnW5s1rJTA4&state=STATE#/publish';
     // console.log(test.slice(test.indexOf('=') + 1, test.indexOf('&state')));
 
-
   }
 }
 </script>
 <style scoped>
 #app {
-  overflow: hidden;
 }
 
 body {

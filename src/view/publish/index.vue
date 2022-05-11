@@ -214,8 +214,12 @@ export default {
      * @private
      */
     _getWxJsJdk() {
+      let isHq = sessionStorage.getItem("hq")=== "HQ";
       this.$api.Exception.getSignature(
-          {url: location.href.split('#')[0]})
+          {
+            url: location.href.split('#')[0],
+            hq: isHq
+          })
           .then(res => {
             if (res.code === 0) {
               this.signature = res.data.signature;

@@ -55,7 +55,7 @@
       <!--          show-word-limit-->
       <!--      />-->
       <van-field
-          v-model="datetime"
+          v-model="chooseDateTime"
           is-link
           readonly
           name="calendar"
@@ -65,7 +65,7 @@
       />
       <van-overlay :show="showCalendar" @click="showCalendar = false">
         <van-datetime-picker type="datetime"
-
+                             v-model="currentDateTime"
                              class="overlay-wrapper"
                              :min-date="minDate"
                              @cancel="showCalendar = false"
@@ -89,7 +89,8 @@ export default {
       countermeasure: "",
       remark: "",
       showCalendar: false,
-      datetime: undefined,
+      currentDateTime: new Date(),
+      chooseDateTime: new Date(),
       impactValues: [],
       normValues: [],
       impactIndicatorList: ['品质', '效率', '交期', '成本', '安全'],
@@ -109,9 +110,9 @@ export default {
       let m = val.getMinutes();
       if (m >= 0 && m <= 9)
         m = '0' + m
-      this.datetime = `${1900 + val.getYear()}-${val.getMonth() + 1}-${val.getDate()} ${h}:${m}`;
+      this.currentDateTime = `${1900 + val.getYear()}-${val.getMonth() + 1}-${val.getDate()} ${h}:${m}`;
       this.showCalendar = false;
-      console.log("_onDateConfirmChoose", this.datetime)
+      this.chooseDateTime = this.currentDateTime;
     },
     onClickLeft() {
       history.back();
@@ -123,7 +124,7 @@ export default {
         cause: this.cause,
         countermeasure: this.countermeasure,
         remark: this.remark,
-        completeTime: this.datetime,
+        completeTime: this.chooseDateTime,
         normValues: this.impactValues
       }
       console.log(param)
@@ -146,6 +147,7 @@ export default {
     this.exceptionId = this.$route.params.id;
     this.orderId = this.$route.params.orderId;
     console.log('mounted', this.exceptionId, this.orderId)
+    this.chooseDateTime = this.$dateFormat(new Date(), 'yyyy-mm-dd H:MM')
   }
 }
 </script>
