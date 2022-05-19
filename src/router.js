@@ -1,4 +1,4 @@
-import {createRouter,createWebHistory} from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 
 const routes = [
     {
@@ -18,7 +18,7 @@ const routes = [
                 path: 'details',
                 component: () => import('./view/exception/exception-details'),
                 meta: {
-                    title: '异常详情',
+                    title: '通知详情',
                     index: 1,
                     showFooter: false
                 },
@@ -37,7 +37,7 @@ const routes = [
             }
         ],
         meta: {
-            title: '异常列表',
+            title: '通知列表',
             index: 0,
             showFooter: true
         }

@@ -41,6 +41,9 @@
                         {{ item.occurTime }}
                       </div>
                       <van-tag plain type="primary" v-if="item.exceptionType">{{ item.exceptionType }}</van-tag>
+                      <van-tag plain type="danger" style="margin-left: 5px" v-if="item.emergencyLevel">
+                        {{ item.emergencyLevel }}
+                      </van-tag>
 
                     </template>
                   </van-card>

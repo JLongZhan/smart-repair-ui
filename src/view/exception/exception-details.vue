@@ -9,9 +9,10 @@
           left-arrow
           @click-left="onClickLeft"
       />
+
       <van-form class="form-wrapper"
-                border="border"
-      >
+                border="border">
+
         <van-cell-group inset>
           <van-field
               v-model="exception.targetName"
@@ -43,6 +44,13 @@
               label="发生时间"
               readonly
           />
+          <van-field
+              v-if="exception.emergencyLevel"
+              v-model="exception.emergencyLevel"
+              name="紧急程度"
+              label="紧急程度"
+              readonly
+          />
 
           <van-field
               v-model="exception.remark"
@@ -50,7 +58,6 @@
               label="备注"
               readonly
           />
-
           <van-field
               v-model="exception.state"
               name="当前状态"
