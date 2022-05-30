@@ -12,6 +12,7 @@ const routes = [
         name: 'Exception',
         path: '/exception',
         component: () => import('./view/exception'),
+
         children: [
             {
                 name: 'ExceptionDetails',

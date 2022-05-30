@@ -1,5 +1,5 @@
 <template>
-  <div class="complete-wrapper">
+  <div class="complete-wrapper" v-if="$route.meta.index===2">
     <van-nav-bar
         title="异常详情"
         left-text="返回"
@@ -15,13 +15,12 @@
           required
           label="异常原因"
           type="textarea"
-          maxlength="50"
+          maxlength="500"
           placeholder="请输入您发现的异常原因"
           show-word-limit
       />
       <van-divider
-          :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 10px' }"
-      >
+          :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 10px' }">
         影响指标
       </van-divider>
       <van-checkbox-group v-model="impactValues" direction="horizontal" style="margin: 10px 0px">
@@ -41,7 +40,7 @@
           autosize
           label="处理对策"
           type="textarea"
-          maxlength="50"
+          maxlength="500"
           placeholder="请输入对应的处理对策"
           show-word-limit
       />
@@ -144,8 +143,8 @@ export default {
   },
 
   mounted() {
-    this.exceptionId = this.$route.params.id;
-    this.orderId = this.$route.params.orderId;
+    this.exceptionId = this.$route.query.id;
+    this.orderId = this.$route.query.orderId;
     console.log('mounted', this.exceptionId, this.orderId)
     this.chooseDateTime = this.$dateFormat(new Date(), 'yyyy-mm-dd H:MM')
   }

@@ -1,7 +1,7 @@
 <template>
   <div style="height: 100%;">
     <router-view></router-view>
-    <div style="min-height: 70%">
+    <div style="min-height: 70%" v-show="$route.meta.index===0">
       <!--      <van-notice-bar-->
       <!--          left-icon="volume-o"-->
       <!--          v-if="noticeStr.length>0"-->
@@ -68,8 +68,9 @@ export default {
   data() {
     return {
       userId: '',
+      username: '',
       currentTab: 0,
-      groupTitles: {0: '全部异常', 1: '我处理的'},
+      groupTitles: {0: '全部通知'},
       publishPageInfo: {
         current: 1,
         size: 7
@@ -125,7 +126,6 @@ export default {
      * @returns {string|boolean}
      */
     getQueryVariable(query, variable) {
-
       let vars = query.split("&");
       for (let i = 0; i < vars.length; i++) {
         let pair = vars[i].split("=");
@@ -140,6 +140,7 @@ export default {
       let UserInfo = sessionStorage.getItem("UserInfo");
       if (userId !== null) {
         this.userId = userId;
+        this.username = UserInfo.name;
         this.userInfo = UserInfo;
         this._getAllPublishExceptionList();
       } else {
@@ -160,6 +161,7 @@ export default {
                   sessionStorage.setItem("UserInfo", JSON.stringify(this.userInfo));
                   sessionStorage.setItem("UserId", this.userInfo.userid);
                   this.userId = this.userInfo.userid;
+                  this.username = this.userInfo.name;
                   this._getAllPublishExceptionList();
                 } else {
                   this.$toast("获取用户信息失败  " + res.message)
@@ -263,7 +265,8 @@ export default {
     _getAllPublishExceptionList() {
       let params = {
         current: this.publishPageInfo.current,
-        size: this.publishPageInfo.size
+        size: this.publishPageInfo.size,
+        username: this.username
       };
       this.$api.Exception.exceptionList(params)
           .then(res => {
