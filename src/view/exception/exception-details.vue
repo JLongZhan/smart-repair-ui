@@ -4,7 +4,7 @@
     <router-view></router-view>
     <div class="details-wrapper" v-show="$route.meta.index===1">
       <van-nav-bar
-          title="通知详情"
+          :title="$route.meta.title"
           left-text="返回"
           left-arrow
           @click-left="onClickLeft"
@@ -533,17 +533,4 @@ input {
   padding: 5px 2px;
 }
 
-::v-deep .van-nav-bar__content {
-  width: 100%;
-  background: #1989fa;
-}
-
-::v-deep( .van-badge__wrapper), ::v-deep( .van-nav-bar__text) {
-  color: #fff;
-}
-
-::v-deep( .van-nav-bar__title) {
-  font-weight: bold;
-  color: #fff;
-}
 </style>

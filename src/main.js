@@ -13,7 +13,7 @@ import {
     SubmitBar, Tabbar, TabbarItem, Button, DropdownMenu, DropdownItem, Notify, Toast
     , List, Card, NavBar, Divider, Tag, ConfigProvider, Empty, NoticeBar, PullRefresh
     , Form, Field, CellGroup, Calendar, DatetimePicker, Skeleton, Image as VanImage,
-    Tab, Tabs, Overlay, Checkbox, CheckboxGroup, Icon
+    Tab, Tabs, Overlay, Checkbox, CheckboxGroup, Icon,Grid, GridItem
 } from 'vant';
 
 const app = createApp(App);
@@ -25,6 +25,7 @@ app.use(Tabbar).use(TabbarItem).use(Button).use(SubmitBar).use(DropdownItem).use
     .use(Notify).use(List).use(Card).use(NavBar).use(Divider).use(Tag).use(ConfigProvider).use(PullRefresh)
     .use(Empty).use(NoticeBar).use(Form).use(Field).use(CellGroup).use(Calendar).use(DatetimePicker)
     .use(Skeleton).use(VanImage).use(Tab).use(Tabs).use(Overlay).use(Checkbox).use(CheckboxGroup).use(Icon)
+    .use(Grid).use(GridItem)
 app.mount('#app');
 
 

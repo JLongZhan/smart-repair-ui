@@ -5,6 +5,7 @@
     <router-view />
     <van-tabbar route fixed placeholder="placeholder" v-if="$route.meta.showFooter">
       <van-tabbar-item replace to="/exception" icon="home-o">异常列表</van-tabbar-item>
+      <van-tabbar-item replace to="/menu" icon="home-o">菜单</van-tabbar-item>
 <!--      <van-tabbar-item replace to="/publish" icon="search">异常推送</van-tabbar-item>-->
       <!--            <van-tabbar-item replace to="/mine" icon="search">我的</van-tabbar-item>-->
     </van-tabbar>

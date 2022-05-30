@@ -155,10 +155,23 @@ input {
     border-top: 2px solid #446dc5;
 }
 
+.van-nav-bar .van-icon, .van-nav-bar__text {
+    color: white;
+}
+ .van-nav-bar__content {
+    width: 100%;
+    background: #1989fa;
+}
+
+::v-deep( .van-nav-bar__title) {
+    font-weight: bold;
+    color: #fff;
+}
+
 
 :root {
     --van-font-weight-bold: 700;
     --van-cell-line-height: 30px;
-    --van-cell-vertical-padding:10px;
+    --van-cell-vertical-padding: 10px;
     --van-cell-horizontal-padding: 2px
 }

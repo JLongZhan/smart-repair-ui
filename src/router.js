@@ -44,6 +44,28 @@ const routes = [
         }
     },
     {
+        name: 'menu',
+        path: '/menu',
+        component: () => import('./view/menu'),
+        meta: {
+            title: '菜单',
+            index: 0,
+            showFooter: true
+        },
+        children: [
+            {
+                name: 'material',
+                path: 'material',
+                component: () => import('./view/material'),
+                meta: {
+                    title: '物料预警',
+                    index: 1,
+                    showFooter: false
+                },
+            }
+        ]
+    },
+    {
         name: 'mine',
         path: '/mine',
         component: () => import('./view/mine'),
