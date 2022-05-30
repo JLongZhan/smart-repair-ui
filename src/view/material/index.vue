@@ -20,7 +20,12 @@
 
 <script>
 export default {
-  name: "index"
+  name: "index",
+  methods: {
+    onClickLeft() {
+      history.back();
+    },
+  }
 }
 </script>
 
