@@ -2,8 +2,8 @@
   <div>
     <div class="material-wrapper" v-show="$route.meta.index===1">
       <van-nav-bar
-          :title="$route.meta.title"
           left-text="返回"
+          :title="$route.meta.title"
           left-arrow
           @click-left="onClickLeft"
       />
@@ -25,6 +25,24 @@ export default {
     onClickLeft() {
       history.back();
     },
+
+    getMaterialList() {
+      let param = {}
+      this.$api.Material.getWorkPlan(param, "http://192.168.162.118:8007")
+          .then(res => {
+            console.log(res);
+          })
+          .catch(err => {
+            console.log(err);
+          })
+    }
+  },
+  mounted() {
+    console.log(123)
+    this.getMaterialList();
+  },
+  created() {
+    console.log(213)
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div  >
     <router-view></router-view>
     <div class="menu-wrapper" v-show="$route.meta.index===0">
       <van-grid square :column-num="3">
