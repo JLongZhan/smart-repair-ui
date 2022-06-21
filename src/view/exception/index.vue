@@ -28,10 +28,10 @@
                           :key="item">
                   <van-card
                       :class="item.currentState===0?'un-process':item.currentState===1?'process':'processed'"
-                      :price="item.location+' '+item.bindLine"
+                      :price="getPrice(item)"
                       :tag="item.state"
                       :desc="item.exceptionDescription"
-                      :title="item.targetName+' - '+item.targetDescription"
+                      :title="getTitle(item)"
                       thumb="https://wework.qpic.cn/wwpic/115896_gnADG-RDTCeeT1j_1642665588/0"
                       @click="_onExceptionItemClick(item.id)"
                       currency=""
@@ -44,7 +44,6 @@
                       <van-tag plain type="danger" style="margin-left: 5px" v-if="item.emergencyLevel">
                         {{ item.emergencyLevel }}
                       </van-tag>
-
                     </template>
                   </van-card>
                 </van-cell>
@@ -97,6 +96,26 @@ export default {
     }
   },
   methods: {
+    getPrice(item){
+      // item.location+' '+item.bindLine
+      if ( item.location !== null && item.bindLine !== null){
+        return item.location + ' ' + item.bindLine
+      }else if (item.location !== null && item.bindLine === null){
+        return item.location
+      }else if (item.location === null && item.bindLine !== null){
+        return item.bindLine
+      }else if (item.location === null && item.bindLine === null){
+        return ''
+      }
+    },
+    getTitle(item){
+      // console.log(item)
+      if (item.targetDescription === null){
+        return item.targetName
+      }else {
+        return item.targetName + ' - ' + item.targetDescription
+      }
+    },
     _onTabChange(e) {
       console.log("_onTabChange", e)
       if (e === 0) {
@@ -301,8 +320,8 @@ export default {
     }
   },
   created() {
-    // this.getUserInfo();
-    this._getAllPublishExceptionList();
+    this.getUserInfo();
+    // this._getAllPublishExceptionList();
   }
 }
 </script>
