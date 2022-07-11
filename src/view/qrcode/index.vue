@@ -1,7 +1,5 @@
 <template>
   <div style="height: 100%;width: 100%">
-    <button @click="exit">退出登录</button>
-    <div v-html="text"></div>
     <!--  微信二维码-->
     <div id="code">
     </div>
