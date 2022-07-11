@@ -28,10 +28,10 @@
                           :key="item">
                   <van-card
                       :class="item.currentState===0?'un-process':item.currentState===1?'process':'processed'"
-                      :price="item.location+' '+item.bindLine"
+                      :price="getPrice(item)"
                       :tag="item.state"
                       :desc="item.exceptionDescription"
-                      :title="item.targetName+' - '+item.targetDescription"
+                      :title="getTitle(item)"
                       thumb="https://wework.qpic.cn/wwpic/115896_gnADG-RDTCeeT1j_1642665588/0"
                       @click="_onExceptionItemClick(item.id)"
                       currency=""
@@ -44,7 +44,6 @@
                       <van-tag plain type="danger" style="margin-left: 5px" v-if="item.emergencyLevel">
                         {{ item.emergencyLevel }}
                       </van-tag>
-
                     </template>
                   </van-card>
                 </van-cell>
@@ -97,6 +96,26 @@ export default {
     }
   },
   methods: {
+    getPrice(item) {
+      // item.location+' '+item.bindLine
+      if (item.location !== null && item.bindLine !== null) {
+        return item.location + ' ' + item.bindLine
+      } else if (item.location !== null && item.bindLine === null) {
+        return item.location
+      } else if (item.location === null && item.bindLine !== null) {
+        return item.bindLine
+      } else if (item.location === null && item.bindLine === null) {
+        return ''
+      }
+    },
+    getTitle(item) {
+      // console.log(item)
+      if (item.targetDescription === null) {
+        return item.targetName
+      } else {
+        return item.targetName + ' - ' + item.targetDescription
+      }
+    },
     _onTabChange(e) {
       console.log("_onTabChange", e)
       if (e === 0) {
@@ -144,36 +163,8 @@ export default {
         this.userInfo = UserInfo;
         this._getAllPublishExceptionList();
       } else {
-        let url = location.href;
-        console.log("当前Url", location)
-        let code = this.getQueryVariable(url.slice(url.indexOf('?') + 1), 'code');
-        if (code !== false) {
-          let hq = this.getQueryVariable(url.slice(url.indexOf('?') + 1), 'state');
-          console.log("code:", code, hq)
-          this.$api.WeiXinApi.getUserInfo({
-            "code": code,
-            "hq": hq === "HQ"
-          })
-              .then(res => {
-                if (res.code === 0) {
-                  this.userInfo = res.data;
-                  sessionStorage.setItem("hq", hq);
-                  sessionStorage.setItem("UserInfo", JSON.stringify(this.userInfo));
-                  sessionStorage.setItem("UserId", this.userInfo.userid);
-                  this.userId = this.userInfo.userid;
-                  this.username = this.userInfo.name;
-                  this._getAllPublishExceptionList();
-                } else {
-                  this.$toast("获取用户信息失败  " + res.message)
-                  this.$router.replace({"name": "qr"})
-                }
-              }).catch(err => {
-            console.log(err)
-          })
-        } else {
-          console.log("请从企业微信端进入")
-          this.$router.replace({"name": "qr"})
-        }
+        console.log("请从企业微信端进入")
+        this.$router.replace({"name": "qr"})
       }
     }
     ,
@@ -301,8 +292,8 @@ export default {
     }
   },
   created() {
-    // this.getUserInfo();
-    this._getAllPublishExceptionList();
+    this.getUserInfo();
+    // this._getAllPublishExceptionList();
   }
 }
 </script>

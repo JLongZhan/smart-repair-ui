@@ -1,8 +1,14 @@
 <template>
-  <div style="height: 100%;width: 100%">
-    <!--  微信二维码-->
-    <div id="code">
-    </div>
+  <div style="height: 100%;width: 100%;overflow: hidden">
+    <van-tabs v-model:active="active" @change="_onTabChange" type="card" class="tab-wrapper">
+      <van-tab title="总部">
+      </van-tab>
+      <van-tab title="声智联">
+      </van-tab>
+    </van-tabs>
+
+    <div id="snodCode"></div>
+
     <div></div>
   </div>
 </template>
@@ -14,63 +20,45 @@ export default {
   data() {
     return {
       text: "",
-      oauthUrl: "http://192.168.162.126:8000/auth-server/oauth/authorize?client_id=eden&response_type=code&redirect_uri=http://192.168.162.126:8080"
-
+      active: 0,
     };
   },
-
   methods: {
-    exit() {
-      console.log("退出登录");
-      location.replace("http://192.168.162.126:8000/auth-server/exit?redirect_uri=http://192.168.162.126:8080")
-      // this.$api.WeiXinApi.exit().then(res => {
-      //   console.log("res", res);
-      // }).catch(err => {
-      //   console.log(err);
-      // })
-    },
-    oauth() {
-      let accessToken = sessionStorage.getItem('access_token')
-      if (accessToken == null) {
-        let url = location.href
-        let origin = location.origin
-        let code = this.getQueryVariable(url.slice(url.indexOf('?') + 1), 'code')
-        if (code !== false) {
-          this.$api.WeiXinApi.callback({code: code})
-              .then(response => {
-                console.log(response);
-                let data = response.data.data
-                sessionStorage.setItem('access_token', data.access_token)
-                sessionStorage.setItem('token', data)
-                this.getUserInfo(data.access_token)
-              })
-        } else {
-          let openUrl = this.$global.url.oauthUrl + origin
-          location.replace(openUrl)
-        }
-      }
-    },
+    _onTabChange(e) {
+      if (e === 0) {
+        new WwLogin({
+          "id": "snodCode",
+          "appid": "wxb0e730f57b92d615",
+          "agentid": "1000042",
+          "redirect_uri": "http://platform.3nod.com.cn:200",
+          "state": "HQ",
+          "href": "",
+          "lang": "zh",
+        });
 
+      } else {
+        new WwLogin({
+          "id": "snodCode",
+          "appid": "wwa829f865e11ecdd0",
+          "agentid": "1000070",
+          "redirect_uri": "http://platform.3nod.com.cn:200",
+          "state": "STATE",
+          "href": "",
+          "lang": "zh",
+        });
+
+      }
+    }
   },
   mounted() {
-    // this.oauth();
-    new WwLogin({
-      "id": "code",
-      "appid": "wxb0e730f57b92d615",
-      "agentid": "1000042",
-      "redirect_uri": "http://platform.3nod.com.cn:200",
-      "state": "HQ",
-      "href": "",
-      "lang": "zh",
-    });
-
+    this._onTabChange(this.active)
   }
 };
 </script>
 
-<style lang="less">
-#code {
-  padding: 20px;
+<style scoped>
+#snodCode {
+  padding: 10px;
   display: flex;
   justify-content: center;
 }
@@ -79,4 +67,13 @@ iframe {
   width: 100% !important;
   min-height: 350px
 }
+
+.tab-wrapper {
+  width: 50%;
+  color: #323233 !important;
+  border-color: #323233 !important;
+  margin: 20px auto;
+}
+
+
 </style>

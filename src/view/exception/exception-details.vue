@@ -414,8 +414,19 @@ export default {
           .then(res => {
             if (res.code === 0) {
               this.exception = res.data;
-              this.exception.targetName += (" - " + this.exception.targetDescription)
-              this.exception.location += " " + this.exception.bindLine;
+
+              this.exception.targetDescription = this.exception.targetDescription || '';
+              this.exception.targetName += this.exception.targetDescription?('-' + this.exception.targetDescription):this.exception.targetDescription
+
+              if (this.exception.location === null && this.exception.bindLine === null){
+                this.exception.location = ''
+              }else if(this.exception.location === null && this.exception.bindLine !== null){
+                this.exception.location = this.exception.bindLine;
+              } else if(this.exception.location !== null && this.exception.bindLine !== null){
+                this.exception.location += " " + this.exception.bindLine;
+              }
+              // this.exception.location += " " + this.exception.bindLine;
+
               this.exception.noticeObjs = JSON.parse(this.exception.noticeObjs);
               if (this.exception.extraData != null && this.exception.extraData.length > 0) {
                 this.exception.extraData = JSON.parse(this.exception.extraData);
@@ -441,7 +452,6 @@ export default {
      * @private
      */
     _completeException() {
-      console.log(222)
       this.$router.push({
         name: 'ExceptionComplete',
         query: {id: this.currentId, orderId: this.exception.processInfo.id}

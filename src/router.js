@@ -62,6 +62,18 @@ const routes = [
                     index: 1,
                     showFooter: false
                 },
+                children: [
+                    {
+                        name: 'MaterialDetail',
+                        path: 'detail',
+                        component: () => import('./view/material/MaterialDetail'),
+                        meta: {
+                            title: '物料详情',
+                            index: 2,
+                            showFooter: false
+                        },
+                    },
+                ]
             }
         ]
     },
@@ -74,6 +86,28 @@ const routes = [
             index: 0,
             showFooter: true
         },
+    },
+    {
+        name: 'setting',
+        path: '/setting',
+        component: () => import('./view/setting'),
+        meta: {
+            title: '我的',
+            index: 0,
+            showFooter: true
+        },
+        children: [
+            {
+                name: 'warningpersonnelsetting',
+                path: 'warningpersonnelsetting',
+                component: () => import('./view/setting/WarningPersonnelSetting'),
+                meta: {
+                    title: '预警人员设置',
+                    index: 1,
+                    showFooter: false
+                },
+            }
+        ]
     },
     {
         name: 'publish',
