@@ -39,32 +39,32 @@ export default {
       return false;
     },
     getUserInfo() {
-      let userId = sessionStorage.getItem("UserId");
-      if (userId === null) {
-        let url = location.href;
-        let code = this.getQueryVariable(url.slice(url.indexOf('?') + 1), 'code');
-        if (code !== false) {
-          let hq = this.getQueryVariable(url.slice(url.indexOf('?') + 1), 'state');
-          this.$api.WeiXinApi.getUserInfo({
-            "code": code,
-            "hq": hq === "HQ"
-          }).then(res => {
-            if (res.code === 0) {
-              this.userInfo = res.data;
-              sessionStorage.setItem("hq", hq);
-              sessionStorage.setItem("UserInfo", JSON.stringify(this.userInfo));
-              sessionStorage.setItem("UserId", this.userInfo.userid);
-            } else {
-              this.$toast("获取用户信息失败  " + res.message)
-              this.$router.replace({"name": "qr"})
-            }
-          }).catch(err => {
-            console.log(err)
-          })
-        } else {
-          console.log("请从企业微信端进入")
-        }
-      }
+      // let userId = sessionStorage.getItem("UserId");
+      // if (userId === null) {
+      //   let url = location.href;
+      //   let code = this.getQueryVariable(url.slice(url.indexOf('?') + 1), 'code');
+      //   if (code !== false) {
+      //     let hq = this.getQueryVariable(url.slice(url.indexOf('?') + 1), 'state');
+      //     this.$api.WeiXinApi.getUserInfo({
+      //       "code": code,
+      //       "hq": hq === "HQ"
+      //     }).then(res => {
+      //       if (res.code === 0) {
+      //         this.userInfo = res.data;
+      //         sessionStorage.setItem("hq", hq);
+      //         sessionStorage.setItem("UserInfo", JSON.stringify(this.userInfo));
+      //         sessionStorage.setItem("UserId", this.userInfo.userid);
+      //       } else {
+      //         this.$toast("获取用户信息失败  " + res.message)
+      //         this.$router.replace({"name": "qr"})
+      //       }
+      //     }).catch(err => {
+      //       console.log(err)
+      //     })
+      //   } else {
+      //     console.log("请从企业微信端进入")
+      //   }
+      // }
     }
   },
 
