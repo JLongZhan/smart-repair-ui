@@ -19,6 +19,7 @@ module.exports = {
 		'vue/no-unused-components': 0,
 		'vue/no-unused-vars': 0,
 		'no-undef': 0,
-		'vue/no-v-model-argument': 0
+		'vue/no-v-model-argument': 0,
+		'vue/no-parsing-error': 0,
 	}
 };
