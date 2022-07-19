@@ -104,6 +104,19 @@ export default {
     this._getWxJsJdk();
   },
   methods: {
+    /**
+     * 获取异常标签
+     * @private
+     */
+    _getExceptionTags() {
+      this.$api.Exception.getExceptionTags()
+          .then(res => {
+            console.log(res);
+          }).catch(err => {
+        console.log(err);
+      })
+    },
+
     _onDateConfirmChoose(val) {
       console.log(val);
       // this.exception.date = `${1900 + val.getYear()}-${val.getMonth() + 1}-${val.getDate()}`;
@@ -214,7 +227,7 @@ export default {
      * @private
      */
     _getWxJsJdk() {
-      let isHq = sessionStorage.getItem("hq")=== "HQ";
+      let isHq = sessionStorage.getItem("hq") === "HQ";
       this.$api.Exception.getSignature(
           {
             url: location.href.split('#')[0],

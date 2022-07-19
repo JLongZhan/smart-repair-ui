@@ -315,8 +315,8 @@ export default {
     }
   },
   created() {
-    this.getUserInfo();
-    // this._getAllPublishExceptionList();
+    // this.getUserInfo();
+    this._getAllPublishExceptionList();
   }
 }
 </script>

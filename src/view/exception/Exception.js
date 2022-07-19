@@ -18,10 +18,11 @@ const Exception = {
                 params: params
             });
     },
-    groupList(params) {
+    getExceptionTags(params, baseUrl) {
         return axios.get(`${base.dev}/appchat/list`,
             {
-                params: params
+                params: params,
+                baseURL: baseUrl
             });
     },
     exceptionDetail(exceptionId) {
