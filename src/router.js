@@ -116,8 +116,8 @@ const routes = [
         component: () => import('./view/publish'),
         meta: {
             title: '异常推送',
-            index: 0,
-            showFooter: true
+            index: 1,
+            showFooter: false
         },
     },
     {

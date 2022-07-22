@@ -56,11 +56,15 @@
       </van-pull-refresh>
       <div style="height: 50px"></div>
     </div>
+    <DragButton @onFloatBtnClicked="_onPushExceptionClick">
+      <van-icon name="phone-o"/>
+    </DragButton>
   </div>
 
 </template>
 
 <script>
+import DragButton from '../../components/DragButton'
 
 export default {
   name: "index",
@@ -95,7 +99,15 @@ export default {
       exceptions: []
     }
   },
+  components: {DragButton},
   methods: {
+    /**
+     * 点击推送异常按钮
+     * @private
+     */
+    _onPushExceptionClick() {
+      this.$router.push({name: 'publish'})
+    },
     getPrice(item) {
       // item.location+' '+item.bindLine
       if (item.location !== null && item.bindLine !== null) {
@@ -210,8 +222,6 @@ export default {
         // 重新加载数据
         this._getProcessExceptionList();
       }
-
-
     }
     ,
     /**
@@ -315,8 +325,8 @@ export default {
     }
   },
   created() {
-    // this.getUserInfo();
-    this._getAllPublishExceptionList();
+    this.getUserInfo();
+    // this._getAllPublishExceptionList();
   }
 }
 </script>

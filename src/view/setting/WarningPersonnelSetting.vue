@@ -27,13 +27,13 @@
                 <van-col span="5">
                     <div class="table-title">部门</div>
                 </van-col>
-                <van-col span="5">
-                    <div class="table-title">备注</div>
-                </van-col>
+<!--                <van-col span="5">-->
+<!--                    <div class="table-title">备注</div>-->
+<!--                </van-col>-->
                 <van-col span="6">
                     <div class="table-title">预警类型</div>
                 </van-col>
-                <van-col span="3" align="center">
+                <van-col span="5" align="center">
                     <div class="table-title">操作</div>
                 </van-col>
             </van-row>

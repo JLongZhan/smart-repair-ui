@@ -9,6 +9,12 @@
           left-arrow
           @click-left="onClickLeft"
       />
+      <van-steps :active="processStep">
+        <van-step>异常提报</van-step>
+        <van-step>工程师接单</van-step>
+        <van-step>处理完成</van-step>
+      </van-steps>
+      <!--      需要按照异常类型分不同组件展示-->
       <van-form class="form-wrapper"
                 v-if="exception.exceptionType==='呼叫线长'"
                 border="border">
@@ -242,6 +248,13 @@
               readonly
           />
           <van-field
+              v-if="exception.exceptionDescription"
+              v-model="exception.exceptionDescription"
+              name="异常描述"
+              label="异常描述"
+              readonly
+          />
+          <van-field
               v-model="exception.location"
               name="异常地点"
               label="异常地点"
@@ -314,8 +327,14 @@
 
 
         </van-cell-group>
-
       </van-form>
+
+      <van-swipe class="my-swipe" :autoplay="3000" v-if="exception.imgUrls && exception.imgUrls.length>0">
+        <van-swipe-item v-for="(image, index) in exception.imgUrls" :key="index">
+          <img v-lazy="image" @click="_onImagePreview(index)"/>
+        </van-swipe-item>
+      </van-swipe>
+
       <div style="margin: 16px;">
         <van-button round block :type="exception.currentState===2?'success':'primary'" @click="_processException"
                     :readonly="exception.currentState!==0">
@@ -332,12 +351,14 @@
 </template>
 
 <script>
+import {ImagePreview} from 'vant';
 
 export default {
   name: "exception",
   data() {
     return {
       userId: undefined,
+      processStep: 0,
       currentId: undefined,
       processStateText: {
         0: '马上处理',
@@ -347,6 +368,7 @@ export default {
       showCompleteButton: false,
       exception: {
         targetName: "",
+        imgUrls: [],
         extraData: "",
         targetDescription: "",
         exceptionDescription: '',
@@ -366,6 +388,18 @@ export default {
     }
   },
   methods: {
+    /**
+     * 图片预览
+     * @param index  图片索引
+     * @private
+     */
+    _onImagePreview(index) {
+      ImagePreview({
+        images: this.exception.imgUrls,
+        startPosition: index,
+        closeable: true,
+      });
+    },
     isNumber(s) {
       return Object.prototype.toString.call(s) === '[object Number]';
     },
@@ -414,18 +448,23 @@ export default {
           .then(res => {
             if (res.code === 0) {
               this.exception = res.data;
-
+              this.processStep = this.exception.currentState;
               this.exception.targetDescription = this.exception.targetDescription || '';
-              this.exception.targetName += this.exception.targetDescription?('-' + this.exception.targetDescription):this.exception.targetDescription
+              this.exception.targetName += this.exception.targetDescription ? ('-' + this.exception.targetDescription) : this.exception.targetDescription
 
-              if (this.exception.location === null && this.exception.bindLine === null){
+              if (this.exception.location === null && this.exception.bindLine === null) {
                 this.exception.location = ''
-              }else if(this.exception.location === null && this.exception.bindLine !== null){
+              } else if (this.exception.location === null && this.exception.bindLine !== null) {
                 this.exception.location = this.exception.bindLine;
-              } else if(this.exception.location !== null && this.exception.bindLine !== null){
+              } else if (this.exception.location !== null && this.exception.bindLine !== null) {
                 this.exception.location += " " + this.exception.bindLine;
               }
               // this.exception.location += " " + this.exception.bindLine;
+
+              if (this.exception.imgUrls) {
+                this.exception.imgUrls = JSON.parse(this.exception.imgUrls);
+              }
+
 
               this.exception.noticeObjs = JSON.parse(this.exception.noticeObjs);
               if (this.exception.extraData != null && this.exception.extraData.length > 0) {
@@ -466,16 +505,19 @@ export default {
      */
     _processException() {
       let userInfo = sessionStorage.getItem("UserInfo");
-      console.log(userInfo)
       let username = '';
       if (userInfo) {
         username = JSON.parse(userInfo).name;
+      }
+      if (!this.userId) {
+        this.$toast("处理人不能为空")
+        return;
       }
       let param = {
         exceptionId: parseInt(this.currentId),
         handlerId: this.userId,
         handlerName: username
-      }
+      };
       this.$api.Exception.exceptionProcess(param)
           .then(res => {
             if (res.code === 0) {
@@ -501,6 +543,12 @@ export default {
 .details-wrapper {
   width: 100%;
   overflow: hidden;
+}
+
+.my-swipe .van-swipe-item, .my-swipe .van-swipe-item img {
+  background-color: #71777d;
+  max-height: 250px;
+  text-align: center;
 }
 
 .extra-wrapper {
