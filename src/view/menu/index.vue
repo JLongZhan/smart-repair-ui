@@ -20,7 +20,6 @@
         },
         created() {
             // window.location.replace( location.href );
-            
         }
     }
 </script>
