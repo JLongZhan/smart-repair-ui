@@ -30,10 +30,10 @@
 <!--                <van-col span="5">-->
 <!--                    <div class="table-title">备注</div>-->
 <!--                </van-col>-->
-                <van-col span="6">
+                <van-col span="10">
                     <div class="table-title">预警类型</div>
                 </van-col>
-                <van-col span="5" align="center">
+                <van-col span="3" align="center">
                     <div class="table-title">操作</div>
                 </van-col>
             </van-row>
@@ -49,11 +49,11 @@
                     <van-field placeholder="部门"
                                v-model="personItem.department"/>
                 </van-col>
-                <van-col span="5">
-                    <van-field placeholder="备注"
-                               v-model="personItem.remarks"/>
-                </van-col>
-                <van-col span="6">
+<!--                <van-col span="5">-->
+<!--                    <van-field placeholder="备注"-->
+<!--                               v-model="personItem.remarks"/>-->
+<!--                </van-col>-->
+                <van-col span="10">
                     <div style="height: 100%; width: 100%;  display: flex; align-items: center; justify-content: center">
                         <!--{{typeSelectList}}-->
                         <el-select

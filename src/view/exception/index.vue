@@ -121,7 +121,6 @@ export default {
       }
     },
     getTitle(item) {
-      // console.log(item)
       if (item.targetDescription === null) {
         return item.targetName
       } else {
@@ -129,7 +128,6 @@ export default {
       }
     },
     _onTabChange(e) {
-      console.log("_onTabChange", e)
       if (e === 0) {
         this.exceptions = this.publishExceptions;
         if (this.publishPageInfo.pages > 1 && this.publishPageInfo.current === this.publishPageInfo.pages) {
@@ -144,7 +142,6 @@ export default {
         } else {
           this.finished = false;
         }
-        console.log(this.processExceptions.length)
         if (this.processExceptions.length === 0) {
           this._getProcessExceptionList();
         }
@@ -228,7 +225,6 @@ export default {
      * 上拉加载更多
      */
     onListLoad() {
-      console.log("------------------------------------onListLoad上拉加载更多")
       if (this.finished === true) {
         return;
       }
@@ -298,7 +294,6 @@ export default {
             this.loading = false;
 
             if (res.code === 0) {
-              console.log(this.exceptions, this.publishExceptions)
               if (res.data.current === 1) {
                 this.publishExceptions = []
               }
