@@ -12,7 +12,7 @@ const Setting = {
     // get预警人员列表
     getAlertPersonList(params, url) {
         let u = url || base.dev;
-        return axios.get(`${u}/user/notice`,
+        return axios.get(`${u}/maintenance/user/notice`,
             {
                 params: params
             });
@@ -20,7 +20,7 @@ const Setting = {
     // delete预警人员列表
     deleteAlertPersonList(params, url) {
         let u = url || base.dev;
-        return axios.delete(`${u}/user/notice`,
+        return axios.delete(`${u}/maintenance/user/notice`,
             {
                 params: params
             });
@@ -28,7 +28,7 @@ const Setting = {
     // post预警人员
     postAlertPersonList(data, url){
         let u = url || base.dev;
-        return axios.post(`${u}/user/notice`, data);
+        return axios.post(`${u}/maintenance/user/notice`, data);
     }
 }
 

@@ -3,13 +3,13 @@ import axios from '@/api/axios'; // 导入http中创建的axios实例
 let baseUrl = base.dev;
 const WeiXinApi = {
     getSignature(params) {
-        return axios.get(`${baseUrl}/weixin/signature`,
+        return axios.get(`${baseUrl}/maintenance/weixin/signature`,
             {
                 params: params
             });
     },
     async getUserInfo(params) {
-        return axios.get(`${base.dev}/weixin/callback`,
+        return axios.get(`${base.dev}/maintenance/weixin/callback`,
             {
                 params: params
             });

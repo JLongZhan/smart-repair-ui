@@ -13,14 +13,13 @@
     "core-js": "^3.6.5",
     "dateformat": "^5.0.3",
     "element-plus": "^2.2.2",
+    "sass-loader": "^13.0.2",
     "vant": "^3.4.1",
     "vconsole": "^3.11.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
     "vuex": "^3.6.2",
-    "wangeditor": "^4.7.12",
-    "work-weixin-js-sdk": "^1.2.1",
-    "zhangeditor": "^1.1.0"
+    "work-weixin-js-sdk": "^1.2.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

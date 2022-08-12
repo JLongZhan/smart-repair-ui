@@ -1,97 +1,164 @@
 <template>
-  <div class="wrapper" id="publish">
-    <van-form @submit="onSubmit">
-      <van-cell-group inset>
-        <van-field
-            v-model="exception.target"
-            name="异常对象"
-            label="异常对象"
-            required
-            placeholder="异常对象"
-            :rules="[{ required: true, message: '请填写异常对象' }]"
+  <div class="container">
+    <van-nav-bar
+        :title="$route.meta.title"
+        left-text="返回"
+        left-arrow
+        @click-left="onClickLeft"
+    />
+    <div class="wrapper" id="publish">
+      <van-field
+          v-model="chooseExceptionType"
+          is-link
+          readonly
+          left-icon="guide-o"
+          label="异常分类"
+          placeholder="请选择异常分类"
+          @click="showExceptionScenes=true"
+      />
+      <van-popup v-model:show="showExceptionScenes" round position="bottom">
+        <van-cascader
+            v-model="exceptionTagsVal"
+            title="请选择异常分类"
+            :options="exceptionTags"
+            @close="showExceptionScenes = false"
+            @finish="onFinishTagChoose"
         />
-        <van-field
-            v-model="exception.description"
-            name="异常描述"
-            required
-            label="异常描述"
-            placeholder="异常描述"
-            :rules="[{ required: true, message: '请填写异常描述' }]"
-        />
-        <van-field
-            v-model="exception.location"
-            name="异常地点"
-            label="异常地点"
-            placeholder="异常地点"
-            required
-            :rules="[{ required: true, message: '请填写异常地点' }]"
-        />
-        <van-field
-            v-model="exception.datetime"
-            is-link
-            readonly
-            name="calendar"
-            label="异常时间"
-            placeholder="点击选择时间"
-            @click="showCalendar = true"
-        />
-        <van-overlay :show="showCalendar" @click="showCalendar = false">
-          <van-datetime-picker type="datetime"
+      </van-popup>
+      <!--紧急程度-->
+      <van-field
+          v-model="exception.chooseEmergencyVal"
+          is-link
+          left-icon="fire-o"
+          readonly
+          label="紧急程度"
+          placeholder="请选择紧急程度"
+          @click="showEmergencyDialog=true"
+      />
+      <van-action-sheet v-model:show="showEmergencyDialog" :actions="emergencyOptions" @select="_onEmergencyChoose"/>
 
-                               class="overlay-wrapper"
-                               :min-date="minDate"
-                               @cancel="showCalendar = false"
-                               @confirm="_onDateConfirmChoose"/>
-        </van-overlay>
-        <van-field
-            class="target-wrapper"
-            clearable
-            label="推送对象"
-            v-model="choosePeople"
-            :rules="[{ required: true, message: '请选择推送对象' }]"
-        >
-          <template #button>
-            <van-button icon="plus" type="primary" plain hairline @click="_selectPeople">
-              选择推送人员
-            </van-button>
-          </template>
-        </van-field>
-      </van-cell-group>
+      <van-field
+          v-model="exception.location"
+          clearable
+          label="地点"
+          left-icon="location-o"
+          placeholder="请输入异常地点"
+      />
 
-      <div style="margin: 16px;">
-        <van-button round block type="primary" native-type="submit" @click="_exceptionPush">
-          立即推送
-        </van-button>
-        `
-      </div>
-    </van-form>
+      <van-field
+          v-model="exception.datetime"
+          center
+          readonly
+          left-icon="underway-o"
+          input-align="right"
+          @click="showDateChooseDialog=true"
+          right-icon="arrow"
+          label="异常时间">
+      </van-field>
+      <van-dialog v-model:show="showDateChooseDialog" title="选择异常时间" show-cancel-button>
+        <van-datetime-picker
+            :show-toolbar="false"
+            v-model="currentDate"
+            :formatter="datePickerFormatter"
+        />
+      </van-dialog>
+      <!-- 推送人员 -->
+      <van-field
+          center
+          autosize
+          type="textarea"
+          readonly
+          left-icon="bullhorn-o"
+          label="推送人员"
+      >
+        <template #input>
+          <div class="tag-wrapper">
+            <van-tag type="primary" plain round closeable size="medium" v-for="(item,idx) in selectWeiXinUserName"
+                     @close="removeChoosePeople(idx)"
+                     :key="item">
+              {{ item }}
+            </van-tag>
+          </div>
+        </template>
+        <template #button>
+          <van-button size="small" type="primary" icon="plus" plain @click="_selectPeople">选择人员</van-button>
+        </template>
+      </van-field>
+      <!--    描述信息-->
+      <van-field
+          v-model="exception.exceptionDescription"
+          rows="2"
+          autosize
+          left-icon="edit"
+          label="异常描述"
+          type="textarea"
+          placeholder="请输入描述信息"
+      />
+      <!--    备注信息-->
+      <van-field
+          v-model="exception.remark"
+          rows="2"
+          autosize
+          left-icon="comment-o"
+          label="备注信息"
+          type="textarea"
+          maxlength="200"
+          placeholder="请输入备注信息"
+          show-word-limit
+      />
+      <!--    图片上传-->
+      <van-uploader :after-read="afterUpload" v-model="uploadImgs" multiple/>
+
+    </div>
+    <div style="margin: 5px 16px;">
+      <van-button round block type="primary" native-type="button" @click="_exceptionPush" :loading="submitLoading"
+                  loading-text="提交中">提交
+      </van-button>
+    </div>
   </div>
 </template>
 
 <script>
-// import { Checkbox, CheckboxGroup, Card, SubmitBar, Toast } from 'vant';
 const wx = require('work-weixin-js-sdk')
+import {Toast} from 'vant';
 
 export default {
   data() {
     return {
-      currentDate: undefined,
+      submitLoading: false,
+      currentDate: new Date(),
+      showDateChooseDialog: false,
+      showEmergencyDialog: false,
+      chooseExceptionType: '',
+      emergencyOptions: [{name: '一般紧急'}, {name: '紧急'}, {name: '特别紧急'}],
+      exceptionTagsVal: '',
+      exceptionTags: [],
+      showExceptionScenes: false,
+      allTags: {},
       exception: {
-        target: '',
-        description: '',
+        chooseEmergencyVal: '',
+        targetName: '',
+        targetDescription: '',
+        exceptionDescription: '',
+        exceptionType: '',
         location: '',
-        datetime: '',
+        datetime: undefined,
         publisher: '',
+        remark: '',
+        fileList: []
       },
-      minDate: new Date(2022, 2, 1),
-      showCalendar: false,
-      selectWeiXinUser: [],
+      uploadImgs: [],
       selectWeiXinUserId: [],
       selectWeiXinUserName: [],
-      choosePeople: '',
     };
   },
-  computed: {},
+  watch: {
+    currentDate(item) {
+      if (item) {
+        this.exception.datetime = this.currentDate = this.formatterCurrentDateTime(item);
+      }
+    }
+  },
   mounted() {
     let userid = sessionStorage.getItem("UserId");
     if (userid == null) {
@@ -102,65 +169,213 @@ export default {
   },
   created() {
     this._getWxJsJdk();
+    this._getExceptionTags();
   },
   methods: {
-    _onDateConfirmChoose(val) {
-      console.log(val);
-      // this.exception.date = `${1900 + val.getYear()}-${val.getMonth() + 1}-${val.getDate()}`;
-      let h = val.getHours();
+    onClickLeft() {
+      history.back();
+    },
+    /**
+     * 移除已经选择通知的人
+     * @param idx
+     */
+    removeChoosePeople(idx) {
+      this.selectWeiXinUserId.splice(idx, 1);
+      this.selectWeiXinUserName.splice(idx, 1);
+    },
+    /**
+     * 格式化当前异常时间
+     * @param date
+     * @returns {string}
+     */
+    formatterCurrentDateTime(date) {
+      date = new Date(date);
+      var strDate = date.getFullYear() + "-";
+      strDate += date.getMonth() + 1 + "-";
+      strDate += date.getDate() + " ";
+      let h = date.getHours();
       if (h >= 0 && h <= 9)
         h = '0' + h
+      strDate += h + ":";
 
-      let m = val.getMinutes();
+      let m = date.getMinutes();
       if (m >= 0 && m <= 9)
         m = '0' + m
-      this.exception.datetime = `${1900 + val.getYear()}-${val.getMonth() + 1}-${val.getDate()} ${h}:${m}`;
-      this.showCalendar = false;
-      console.log("_onDateConfirmChoose", this.exception.datetime)
+      strDate += m;
+      return strDate;
     },
-
-    onSubmit() {
-      console.log("提交")
+    /**
+     *  date-picker 控件 时间显示格式化
+     * @param type
+     * @param val
+     * @returns {string|*}
+     */
+    datePickerFormatter(type, val) {
+      if (type === 'month') {
+        return `${val}月`;
+      } else if (type === 'day') {
+        return `${val}日`;
+      } else if (type === 'hour') {
+        return `${val}时`;
+      } else if (type === 'minute') {
+        return `${val}分`;
+      }
+      return val;
     },
+    /**
+     * 文件上传后回调
+     */
+    afterUpload(file) {
+      let param = {
+        "bucket": "smart-repair"
+      }
+      let formData = new FormData()
+      formData.append('file', file.file)
+      this.$api.Exception
+          .uploadImage(formData, param)
+          .then(res => {
+            console.log(res);
+            if (res.code === 0) {
+              this.exception.fileList.push.apply(this.exception.fileList, res.data)
+            }
+          }).catch(err => {
+        console.log(err);
+      })
+    },
+    /**
+     * 紧急 程度选择后回调
+     * @param e
+     * @private
+     */
+    _onEmergencyChoose(item) {
+      this.showEmergencyDialog = false
+      this.exception.chooseEmergencyVal = item.name;
+    },
+    /**
+     * 异常类型选择结束后回调
+     * @param e
+     */
+    onFinishTagChoose(e) {
+      this.showExceptionScenes = false;
+      console.log(e.selectedOptions.map((option) => option.text));
+      let tags = e.selectedOptions.map((option) => option.text);
+      this.exception.exceptionType = tags[0];
+      this.exception.targetName = tags[1];
+      this.exception.targetDescription = tags[2];
+      this.chooseExceptionType = e.selectedOptions.map((option) => option.text).join(' / ');
+    },
+    /**
+     * 获取异常标签
+     * @private
+     */
+    _getExceptionTags() {
+      let params = {
+        groupBy: true
+      }
+      this.$api.Exception.getExceptionTags(params)
+          .then(res => {
+            console.log(res);
+            if (res.code === 0) {
+              this.allTags = res.data;
+              this._changeTagDataFormat(res.data)
+            }
+          }).catch(err => {
+        console.log(err);
+      })
+    },
+    /**
+     * 修改接口返回的异常标签数据格式，符合vant 组件要求
+     * @param tags
+     * @private
+     */
+    _changeTagDataFormat(tags) {
+      let resultData = [];
+      for (let tagsKey in tags) {
+        let scenesItem = {
+          "text": tagsKey,
+          "value": tagsKey,
+        };
+        let scenesChildren = [];
+        scenesItem['children'] = scenesChildren;
+        for (let tagKey in tags[tagsKey]) {
+          let typeItem = {
+            "text": tagKey,
+            "value": tagKey,
+          };
+          let typeChildren = [];
+          typeItem['children'] = typeChildren;
+          for (let item of tags[tagsKey][tagKey]) {
+            let valItem = {
+              "text": item,
+              "value": item,
+            };
+            typeChildren.push(valItem)
+          }
+          scenesChildren.push(typeItem)
+        }
+        resultData.push(scenesItem);
+      }
+      this.exceptionTags = resultData;
+    },
+    /**
+     * 异常推送
+     * @private
+     */
     _exceptionPush() {
-      if (this.selectWeiXinUser.length === 0) {
+      console.log(this.exception)
+      if (this.selectWeiXinUserId.length === 0) {
         this.$toast("请选择推送人员");
         return;
       }
-      if (this.exception.target === '' ||
-          this.exception.datetime === ''
-          || this.exception.description === '' || this.exception.location === '') {
-        this.$toast("请输入完信息在提交");
+      if (
+          this.exception.targetName === '' ||
+          this.exception.targetDescription === '' ||
+          this.exception.chooseEmergencyVal === '' ||
+          this.exception.datetime === '' ||
+          this.exception.exceptionDescription === '' ||
+          this.exception.exceptionType === '' ||
+          this.exception.location === '') {
+        this.$toast("请完善信息后再提交");
         return;
       }
       let hq = sessionStorage.getItem("hq");
       let param =
           {
-            "targetName": this.exception.target,
-            "targetDescription": this.exception.description,
+            "targetName": this.exception.targetName,
+            "targetDescription": this.exception.targetDescription,
+            "exceptionDescription": this.exception.exceptionDescription,
+            "exceptionType": this.exception.exceptionType,
+            "emergencyLevel": this.exception.chooseEmergencyVal,
+            "remark": this.exception.remark,
             "location": this.exception.location,
             "occurDate": this.exception.datetime,
             "publisher": this.exception.publisher,
+            "imgUrls": this.exception.fileList,
             "noticeObj": this.selectWeiXinUserId,
             "noticeObjNames": this.selectWeiXinUserName,
             "pushFrom": 1,
             "hq": "HQ" === hq
           };
-      console.log(param)
+      this.submitLoading = true;
       this.$api.Exception.exceptionPush(param)
           .then(res => {
+            this.submitLoading = false;
             console.log(res)
             if (res.code === 0) {
               this.$toast("推送成功");
               this.exception = {
-                target: '',
-                description: '',
+                chooseEmergencyVal: '',
+                targetName: '',
+                targetDescription: '',
+                exceptionDescription: '',
+                exceptionType: '',
                 location: '',
-                date: '',
-                time: '',
+                datetime: undefined,
                 publisher: '',
-              };
-              this.choosePeople = ''
+                remark: '',
+                fileList: []
+              }
+              this.$router.replace({name: 'Exception'})
             } else {
               this.$toast("推送失败" + res.message)
             }
@@ -168,11 +383,11 @@ export default {
         console.log(err)
       })
     },
+    /**
+     * 选择推送人员
+     * @private
+     */
     _selectPeople() {
-      this.choosePeople = '';
-      this.selectWeiXinUser = [];
-      this.selectWeiXinUserId = [];
-      this.selectWeiXinUserName = [];
       wx.invoke('selectEnterpriseContact', {
             "fromDepartmentId": -1,// 必填，表示打开的通讯录从指定的部门开始展示，-1表示自己所在部门开始, 0表示从最上层开始
             "mode": "multi",// 必填，选择模式，single表示单选，multi表示多选
@@ -180,7 +395,6 @@ export default {
             "selectedDepartmentIds": [],// 非必填，已选部门ID列表。用于多次选人时可重入，single模式下请勿填入多个id
             "selectedUserIds": []// 非必填，已选用户ID列表。用于多次选人时可重入，single模式下请勿填入多个id
           }, (res => {
-            console.log('失败', res)
             if (res.err_msg === "selectEnterpriseContact:ok") {
               if (typeof res.result == 'string') {
                 res.result = JSON.parse(res.result) //由于目前各个终端尚未完全兼容，需要开发者额外判断result类型以保证在各个终端的兼容性
@@ -193,17 +407,15 @@ export default {
                               let departemntName = department.name;// 已选的单个部门名称
               }*/
               let selectedUserList = res.result.userList; // 已选的成员列表
-              this.selectWeiXinUser = res.result.userList;
 
               for (let i = 0; i < selectedUserList.length; i++) {
                 let user = selectedUserList[i];
                 console.log(user)
-                this.selectWeiXinUserId.push(user.id)
-                this.selectWeiXinUserName.push(user.name)
+                if (this.selectWeiXinUserId.indexOf(user.id) === -1) {
+                  this.selectWeiXinUserId.push(user.id)
+                  this.selectWeiXinUserName.push(user.name)
+                }
                 // let userAvatar = user.avatar;// 已选的单个成员头像
-              }
-              if (this.selectWeiXinUserName.length > 0) {
-                this.choosePeople = this.selectWeiXinUserName.join(",")
               }
             }
           })
@@ -214,7 +426,7 @@ export default {
      * @private
      */
     _getWxJsJdk() {
-      let isHq = sessionStorage.getItem("hq")=== "HQ";
+      let isHq = sessionStorage.getItem("hq") === "HQ";
       this.$api.Exception.getSignature(
           {
             url: location.href.split('#')[0],
@@ -257,10 +469,32 @@ export default {
 <style lang="less">
 .wrapper {
   overflow: hidden;
+  padding: 0 14px;
 }
+
+.van-uploader__upload {
+  margin-top: 5px;
+  border: 1px solid #e8e8e8;
+  background-color: white;
+}
+
+.van-uploader__upload .van-icon {
+  color: #323232;
+}
+
+.van-tag {
+  margin-left: 2px;
+}
+
 
 .target-wrapper label {
   color: #646566 !important;
+}
+
+.van-field__left-icon .van-badge__wrapper {
+  font-size: 18px;
+  margin-right: 3px;
+  color: #1989fa;
 }
 
 .overlay-wrapper {
