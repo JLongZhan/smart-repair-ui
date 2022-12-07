@@ -5,7 +5,11 @@
         left-text="返回"
         left-arrow
         @click-left="onClickLeft"
-    />
+    >
+      <template #right>
+        <van-icon name="scan" size="24" @click="scanQr"/>
+      </template>
+    </van-nav-bar>
     <div class="wrapper" id="publish">
       <van-field
           v-model="chooseExceptionType"
@@ -270,7 +274,7 @@ export default {
      */
     _getExceptionTags() {
       let params = {
-        groupBy: true
+        scenes: '异常上报'
       }
       this.$api.Exception.getExceptionTags(params)
           .then(res => {
@@ -290,31 +294,22 @@ export default {
      */
     _changeTagDataFormat(tags) {
       let resultData = [];
-      for (let tagsKey in tags) {
+      tags.forEach(item => {
         let scenesItem = {
-          "text": tagsKey,
-          "value": tagsKey,
+          "text": item.typeName,
+          "value": item.typeName,
         };
         let scenesChildren = [];
         scenesItem['children'] = scenesChildren;
-        for (let tagKey in tags[tagsKey]) {
-          let typeItem = {
-            "text": tagKey,
-            "value": tagKey,
+        item.exceptionTags.forEach(tag => {
+          let valItem = {
+            "text": tag.valueName,
+            "value": tag.valueName,
           };
-          let typeChildren = [];
-          typeItem['children'] = typeChildren;
-          for (let item of tags[tagsKey][tagKey]) {
-            let valItem = {
-              "text": item,
-              "value": item,
-            };
-            typeChildren.push(valItem)
-          }
-          scenesChildren.push(typeItem)
-        }
-        resultData.push(scenesItem);
-      }
+          scenesChildren.push(valItem)
+        })
+        resultData.push(scenesItem)
+      })
       this.exceptionTags = resultData;
     },
     /**
@@ -421,6 +416,28 @@ export default {
           })
       );
     },
+
+    /**
+     * 微信扫一扫
+     */
+    scanQr() {
+      wx.scanQRCode({
+        desc: 'scanQRCode desc',
+        needResult: 0, // 默认为0，扫描结果由企业微信处理，1则直接返回扫描结果，
+        scanType: ["qrCode", "barCode"], // 可以指定扫二维码还是条形码（一维码），默认二者都有
+        success: function (res) {
+          // 回调
+          // var result = res.resultStr;//当needResult为1时返回处理结果
+          alert(res)
+        },
+        error: function (res) {
+          if (res.errMsg.indexOf('function_not_exist') > 0) {
+            alert('版本过低请升级')
+          }
+        }
+      });
+
+    },
     /**
      * 微信Sdk初始化配置
      * @private
@@ -446,7 +463,7 @@ export default {
                 timestamp: this.timestamp, // 必填，生成签名的时间戳
                 nonceStr: this.noncestr, // 必填，生成签名的随机串
                 signature: this.signature,// 必填，签名，见附录1
-                jsApiList: ['checkJsApi', 'selectEnterpriseContact', 'openUserProfile', 'hideOptionMenu'] // 必填，需要使用的JS接口列表，凡是要调用的接口都需要传进来
+                jsApiList: ['checkJsApi', 'selectEnterpriseContact', 'openUserProfile', 'hideOptionMenu', 'scanQRCode'] // 必填，需要使用的JS接口列表，凡是要调用的接口都需要传进来
               });
               wx.ready(() => {
                 console.log('成功')

@@ -19,7 +19,7 @@ const Exception = {
             });
     },
     getExceptionTags(params) {
-        return axios.get(`${base.dev}/maintenance/dict/list`,
+        return axios.get(`${base.dev}/maintenance/exception/tag/list`,
             {
                 params: params
             });
